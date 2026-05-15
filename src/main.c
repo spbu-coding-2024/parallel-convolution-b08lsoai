@@ -23,8 +23,11 @@ int main(int argc, char **argv) {
     return 0;
   }
 
-  ret = process_image(args);
-
+  if (args->queue_flag) {
+    ret = process_image_queue(args);
+  } else {
+    ret = process_image(args);
+  }
   if (ret < 0) {
     free_args(args);
     return -1;
