@@ -37,6 +37,22 @@ int process_image(args_t *args) {
       new_image = seq_convolution(image, filter);
       break;
 
+    case MODE_ROW:
+      new_image = parallel_row_convolution(image, filter);
+      break;
+
+    case MODE_PIXEL:
+      new_image = parallel_pixel_convolution(image, filter);
+      break;
+
+    case MODE_COLUMN:
+      new_image = parallel_column_convolution(image, filter);
+      break;
+
+    case MODE_BLOCK:
+      new_image = parallel_block_convolution(image, filter);
+      break;
+
     default:
       fprintf(stderr, "Error: unknown mode %d\n", mode);
       FREE_IMAGES;
