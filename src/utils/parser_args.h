@@ -27,6 +27,7 @@ typedef struct {
   conv_mode mode;
   filter_name filter;
   bool help_flag;
+  bool queue_flag;
 } args_t;
 
 int parse_args(int argc, char *argv[], args_t *args);

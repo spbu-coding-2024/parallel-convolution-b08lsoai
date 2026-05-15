@@ -8,7 +8,8 @@
 
 #define USAGE_PRINT                                                            \
   fprintf(stderr,                                                              \
-          "Usage: %s --filter=<filter_name> --mode=<mode> [--help | -h]"       \
+          "Usage: %s --filter=<filter_name> --mode=<mode> [--help | -h] "      \
+          "[--queue | -q]"                                                     \
           "<input_file>\n",                                                    \
           argv[0]);                                                            \
   fprintf(stderr, "Use '%s --help' for more information.\n", argv[0]);
@@ -20,6 +21,7 @@ bool is_file(char *filename) { return (filename && strchr(filename, '.')); }
 void init_args(args_t *args) {
   args->filter = INVALID;
   args->help_flag = false;
+  args->queue_flag = false;
   args->filenames = NULL;
   args->images_number = 0;
   args->mode = MODE_INVALID;
@@ -84,7 +86,8 @@ static int add_filename(args_t *args, char *filename) {
 }
 
 void print_help(char *argv[]) {
-  printf("Usage: %s --filter=<filter_name> --mode=<mode> [--help | -h]"
+  printf("Usage: %s --filter=<filter_name> --mode=<mode> [--help | -h] "
+         "[--queue | -q] "
          "<input_file>\n\n",
          argv[0]);
 
@@ -98,6 +101,7 @@ void print_help(char *argv[]) {
   printf("                  column   - Parallel by columns\n");
   printf("                  pixel    - Parallel by individual pixels\n");
   printf("                  block    - Parallel by blocks (64x64)\n\n");
+  printf("  --queue, -q   Enable pipeline mode (process multiple images)\n\n");
   printf("  --help, -h    Show this help message\n\n");
 }
 
@@ -150,6 +154,8 @@ int parse_args(int argc, char *argv[], args_t *args) {
       print_help(argv);
       args->help_flag = true;
       return 0;
+    } else if (strcmp(argv[i], "--queue") == 0 || strcmp(argv[i], "-q") == 0) {
+      args->queue_flag = true;
     } else if (strncmp(argv[i], "-", 1) == 0) {
       fprintf(stderr, "Error: unknown option '%s'\n", argv[i]);
       USAGE_PRINT
