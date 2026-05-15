@@ -45,6 +45,14 @@ filter_name parse_filter_arg(char *filter_str) {
 conv_mode parse_mode_arg(char *mode_str) {
   if (strcmp(mode_str, "seq") == 0) {
     return MODE_SEQ;
+  } else if (strcmp(mode_str, "pixel") == 0) {
+    return MODE_PIXEL;
+  } else if (strcmp(mode_str, "row") == 0) {
+    return MODE_ROW;
+  } else if (strcmp(mode_str, "column") == 0) {
+    return MODE_COLUMN;
+  } else if (strcmp(mode_str, "block") == 0) {
+    return MODE_BLOCK;
   }
   return MODE_INVALID;
 }
@@ -86,6 +94,10 @@ void print_help(char *argv[]) {
          "sharpen\n\n");
   printf("  --mode=       Parallelization strategy\n");
   printf("                  seq      - Sequential\n");
+  printf("                  row      - Parallel by rows\n");
+  printf("                  column   - Parallel by columns\n");
+  printf("                  pixel    - Parallel by individual pixels\n");
+  printf("                  block    - Parallel by blocks (64x64)\n\n");
   printf("  --help, -h    Show this help message\n\n");
 }
 
@@ -125,13 +137,13 @@ int parse_args(int argc, char *argv[], args_t *args) {
       char *mode = argv[i] + 7;
       if (strlen(mode) == 0) {
         fprintf(stderr, "Error: --mode requires a value\n");
-        fprintf(stderr, "Valid modes: seq\n");
+        fprintf(stderr, "Valid modes: seq, pixel, row, column, block\n");
         return -1;
       }
       args->mode = parse_mode_arg(mode);
       if (args->mode == MODE_INVALID) {
         fprintf(stderr, "Error: invalid mode '%s'\n", mode);
-        fprintf(stderr, "Valid modes: seq\n");
+        fprintf(stderr, "Valid modes: seq, pixel, row, column, block\n");
         return -1;
       }
     } else if (strcmp(argv[i], "--help") == 0 || strcmp(argv[i], "-h") == 0) {

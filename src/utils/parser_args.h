@@ -15,6 +15,10 @@ typedef enum {
 typedef enum {
   MODE_INVALID = -1,
   MODE_SEQ,
+  MODE_PIXEL,
+  MODE_ROW,
+  MODE_COLUMN,
+  MODE_BLOCK,
 } conv_mode;
 
 typedef struct {
