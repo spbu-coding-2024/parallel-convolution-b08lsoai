@@ -64,7 +64,7 @@ void queue_enqueue(queue_t *queue, image_t *image, const char *filename) {
       return;
     }
   }
-  
+
   queue_node_t *node = malloc(sizeof(queue_node_t));
   if (!node) {
     fprintf(stderr, "Error: malloc failed in enqueue 3\n");
