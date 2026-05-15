@@ -42,6 +42,44 @@
 ![Image Benchmark](result_large.png)
 ![Image Benchmark](result_large_parallel.png)
 
+## Performance Comparison: Normal vs Queue Mode
+
+**Configuration:**
+- Filter: motion (9x9)
+- Mode: block
+- Runs: 20
+- Readers: 2 (default)
+- Workers: 4 (default)
+- Writers: 2 (default)
+
+**Average Time, seconds**
+| Files | Normal | Queue |
+|-------|--------|-------|
+| 1 | **0.1894** | 0.2194 |
+| 3 | 0.9871 | **0.9426** |
+| 10 | 28.2102 | **9.1481** |
+| 20 | 46.8471 | **12.1874** |
+| 50 | 97.8328 | **22.1037** |
+
+![Image Benchmark](standard_vs_queue.png)
+
+## Pipeline Thread Scaling
+
+**Configuration:**
+- Filter: motion (9x9)
+- Mode: block
+- Runs: 20
+- Number of files: 20
+
+| Workers | Readers | Writers | Avg (sec) |
+|---------|---------|---------|------------|
+| 1 | 1 | 1 | 19.9260 |
+| 2 | 1 | 1 | 12.7607 |
+| 4 | 1 | 1 | 8.3654 |
+| 4 | 2 | 2 | 7.8445 |
+| 8 | 2 | 2 | 6.2763 |
+| 12 | 2 | 2 | 6.1634 | 
+
 ## Conclusion
 
 We can make following conclusions:
@@ -49,3 +87,5 @@ We can make following conclusions:
 - **Row-parallel and Pixel-parallel are nearly identical**
 - **Column mode** is the slowest due to poor cache locality
 - **Block-parallel has higher overhead** on small images, but performs well on large images
+- **For a single image**, Standard mode is slightly faster (Queue adds thread management overhead)
+- **For 3+ images**, Queue mode starts to outperform Standard mode

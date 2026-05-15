@@ -11,6 +11,7 @@ Image convolution tool with multiple parallelization strategies.
   - `column` - parallel by columns  
   - `pixel` - parallel by individual pixels
   - `block` - parallel by blocks (64x64)
+- **Pipeline mode**: `--queue` / `-q` - process multiple images with reader/worker/writer threads
 - **Formats**: `jpeg`, `jpg`, `png`, `bmp`, `tga`
 
 ## Build
@@ -22,7 +23,7 @@ make build
 ## Usage
 
 ```bash
-./build/convol <input_file> --filter=<filter> --mode=<mode> [--help | -h]
+./build/convol <input_file> --filter=<filter> --mode=<mode> [--help | -h] [--queue | -q]
 ````
 
 ## Examples
@@ -36,6 +37,9 @@ make build
 
 # Emboss effect with row-parallel execution
 ./build/convol photo.jpg --filter=emboss --mode=row
+
+# Pipeline mode: process all images in ./images folder
+./build/convol ./images/*.jpg --filter=gaussian --mode=pixel --queue
 
 # Parallel blocks with motion blur for multiple files
 ./build/convol image.png photo.png file.bmp --filter=motion --mode=block
@@ -55,6 +59,13 @@ make bench
 # Custom filter and image
 make bench FILTER=blur IMAGE=./images/photo.png
 make bench FILTER=gaussian IMAGE=./images/image.jpg
+```
+**Pipeline mode benchmark (Standard vs Queue)**
+```bash
+# Default (filter=motion, image=./images/test_image.jpg, mode=block)
+make bench-queue
+# Custom filter and image
+make bench-queue FILTER_Q=blur MODE_Q=block IMAGE="./images/*.jpg"
 ```
 
 Benchmark results are located in a [corresponding](./benchmark_res/) folder
