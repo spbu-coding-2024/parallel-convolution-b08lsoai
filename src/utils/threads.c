@@ -7,19 +7,17 @@
 void *reader_thread(void *arg) {
   params_t *params = (params_t *)arg;
   queue_t *load_queue = params->load_queue;
-  size_t read_files_local = 0;
   char **files_list = params->filenames;
   size_t files_number = params->images_number;
 
   while (1) {
-    read_files_local =
-        __atomic_fetch_add(params->read_counter, 1, __ATOMIC_ACQUIRE);
-    if (read_files_local >= files_number) {
-      // ? нужен ли откат
-      __atomic_fetch_sub(params->read_counter, 1, __ATOMIC_RELEASE);
+    size_t idx = atomic_fetch_add_explicit(params->read_counter, 1,
+                                           memory_order_relaxed);
+    if (idx >= files_number) {
+      atomic_fetch_sub_explicit(params->read_counter, 1, memory_order_relaxed);
       break;
     }
-    const char *filename = files_list[read_files_local];
+    const char *filename = files_list[idx];
     image_t *src_image = load_image(filename);
     if (!src_image) {
       break;
@@ -91,13 +89,15 @@ void *writer_thread(void *arg) {
   params_t *params = (params_t *)arg;
   queue_t *save_queue = params->save_queue;
   const char *filter_name = params->filter->name;
-  size_t read_files_local = 0;
   size_t files_number = params->images_number;
 
   while (1) {
 
-    read_files_local = __atomic_load_n(params->write_counter, __ATOMIC_ACQUIRE);
-    if (read_files_local >= files_number) {
+    size_t written = atomic_fetch_add_explicit(params->write_counter, 1,
+                                               memory_order_relaxed);
+
+    if (written >= files_number) {
+      atomic_fetch_sub_explicit(params->write_counter, 1, memory_order_relaxed);
       break;
     }
 
@@ -121,8 +121,6 @@ void *writer_thread(void *arg) {
       img_info_free(img_info);
       break;
     }
-    read_files_local =
-        __atomic_add_fetch(params->write_counter, 1, __ATOMIC_RELEASE);
 
     free_image(img_info->image);
     img_info_free(img_info);
